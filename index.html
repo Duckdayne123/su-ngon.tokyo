@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Trang kiểm tra IP Việt Nam</title>
+</head>
+<body>
+	<script>
+		// Lưu lại URL của trang check vào sessionStorage để dùng sau khi F5
+		sessionStorage.setItem('lastPage', window.location.href);
+		
+		// Xử lý sự kiện khi nhấn phím F5
+		window.addEventListener('keydown', function(event) {
+			if (event.keyCode === 116) { // keyCode của F5 là 116
+				// Chuyển đến trang check đã lưu trước đó
+				event.preventDefault(); // Ngăn không cho trình duyệt thực hiện hành động mặc định của phím F5
+				window.location.href = sessionStorage.getItem('lastPage');
+			}
+		});
+		
+		// Xử lý khi nhập "view-source:" trên trình duyệt
+		if (window.location.href.indexOf('view-source:') > -1) {
+			window.location.href = sessionStorage.getItem('lastPage');
+		}
+	</script>
+	<h1>Đây là trang kiểm tra IP Việt Nam</h1>
+	<p>Bạn chỉ có thể truy cập trang này nếu đang sử dụng IP Việt Nam.</p>
+	<button id="continueBtn" onclick="checkAccess()">Tiếp tục</button>
+	<script>
+		function checkAccess() {
+// Lấy địa chỉ IP của người dùng
+			fetch('https://api.ipify.org?format=json')
+			.then(response => response.json())
+			.then(data => {
+				const ip = data.ip;
+				console.log('IP của bạn là: ' + ip);
+
+				// Kiểm tra xem IP có phải là IP Việt Nam hay không
+				fetch(`https://api.ipgeolocation.io/ipgeo?apiKey=11f67d4ad100430c8873d7082b6ffd19&ip=${ip}`)
+				.then(response => response.json())
+				.then(data => {
+					const country = data.country_name;
+					console.log('Quốc gia của bạn là: ' + country);
+
+					// Nếu là IP Việt Nam, cho phép truy cập vào trang web tiếp theo
+					if (country === 'Vietnam') {
+						window.location.href = '/index1.html';
+					}
+					// Nếu không phải là IP Việt Nam, hiển thị thông báo lỗi
+					else {
+						alert('Bạn không thể truy cập vào trang web này vì địa chỉ IP của bạn không phải là IP Việt Nam.');
+					}
+				})
+				.catch(error => {
+					console.error('Đã xảy ra lỗi: ' + error);
+				});
+			})
+			.catch(error => {
+				console.error('Đã xảy ra lỗi: ' + error);
+			});
+		}
+	</script>
+</body>
+</html>
